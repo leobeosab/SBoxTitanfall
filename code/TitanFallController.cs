@@ -7,7 +7,7 @@ using Sandbox;
 
 namespace dotasmsplayground
 {
-	class TitanFallController : BasePlayerController
+	public class TitanFallController : BasePlayerController
 	{
 		public float SprintSpeed { get; set; } = 500.0f;
 		public float WalkSpeed { get; set; } = 200.0f;
@@ -16,7 +16,6 @@ namespace dotasmsplayground
 		public float AirAcceleration { get; set; } = 100.0f;
 		public float FallSoundZ { get; set; } = -30.0f;
 		public float GroundFriction { get; set; } = 4.0f;
-		public float SlideFrictionFactor { get; set; } = 0.1f;
 		public float StopSpeed { get; set; } = 100.0f;
 		public float Size { get; set; } = 20.0f;
 		public float DistEpsilon { get; set; } = 0.03125f;
@@ -33,10 +32,13 @@ namespace dotasmsplayground
 		public bool Swimming { get; set; } = false;
 		public bool AutoJump { get; set; } = false;
 
+		// My Custom bullshit
+		public float SlideThreshold { get; set; } = 200f;
+		public float SlideFrictionFactor { get; set; } = 0.05f;
 		public float JumpStrength { get; set; } = 100f;
 		public float DoubleJumpModifier { get; set; } = 3.5f;
 
-		public Duck Duck;
+		public TitanFallDuck Duck;
 		public Unstuck Unstuck;
 
 		private bool hasDoubleJumped;
@@ -45,7 +47,7 @@ namespace dotasmsplayground
 
 		public TitanFallController()
 		{
-			Duck = new Duck( this );
+			Duck = new TitanFallDuck( this );
 			Unstuck = new Unstuck( this );
 		}
 
@@ -151,9 +153,7 @@ namespace dotasmsplayground
 				{
 					// Basic Sliding functionality
 					float friction = GroundFriction * SurfaceFriction;
-					float velocityNormal = Velocity.Abs().x + Velocity.Abs().y;
-					Log.Info( velocityNormal );
-					if (Duck.IsActive && velocityNormal > 200f)
+					if (Duck.IsSliding)
 					{
 						friction *= SlideFrictionFactor;
 					}
