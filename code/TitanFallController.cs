@@ -16,6 +16,7 @@ namespace dotasmsplayground
 		public float AirAcceleration { get; set; } = 100.0f;
 		public float FallSoundZ { get; set; } = -30.0f;
 		public float GroundFriction { get; set; } = 4.0f;
+		public float SlideFrictionFactor { get; set; } = 0.1f;
 		public float StopSpeed { get; set; } = 100.0f;
 		public float Size { get; set; } = 20.0f;
 		public float DistEpsilon { get; set; } = 0.03125f;
@@ -148,7 +149,15 @@ namespace dotasmsplayground
 
 				if ( GroundEntity != null )
 				{
-					ApplyFriction( GroundFriction * SurfaceFriction );
+					// Basic Sliding functionality
+					float friction = GroundFriction * SurfaceFriction;
+					float velocityNormal = Velocity.Abs().x + Velocity.Abs().y;
+					Log.Info( velocityNormal );
+					if (Duck.IsActive && velocityNormal > 200f)
+					{
+						friction *= SlideFrictionFactor;
+					}
+					ApplyFriction(friction);
 				}
 			}
 
